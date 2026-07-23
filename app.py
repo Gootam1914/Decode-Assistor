@@ -77,63 +77,105 @@ def load_entries(path: Path = LOG_PATH) -> List[Dict]:
         return list(csv.DictReader(f))
 
 st.set_page_config(
-    page_title="Absolute Zero AI Command Center",
-    page_icon="🛡️",
+    page_title="Absolute Zero · Command Center",
+    page_icon="❄️",
     layout="wide",
 )
 
+
+def _flake_svg(cls: str, size: int) -> str:
+    """Reusable six-point snowflake mark — the Absolute Zero brand glyph."""
+    return (
+        f'<svg class="{cls}" width="{size}" height="{size}" viewBox="0 0 24 24" '
+        'fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">'
+        '<line x1="12" y1="1.5" x2="12" y2="22.5"/>'
+        '<line x1="2.9" y1="6.75" x2="21.1" y2="17.25"/>'
+        '<line x1="2.9" y1="17.25" x2="21.1" y2="6.75"/>'
+        '<path d="M12 5.2 L9.9 6.7 M12 5.2 L14.1 6.7 M12 18.8 L9.9 17.3 M12 18.8 L14.1 17.3"/>'
+        '<path d="M4.9 8.7 L4.8 11.1 M4.9 8.7 L7.1 8.3 M19.1 15.3 L19.2 12.9 M19.1 15.3 L16.9 15.7"/>'
+        '<path d="M4.9 15.3 L7.1 15.7 M4.9 15.3 L4.8 12.9 M19.1 8.7 L16.9 8.3 M19.1 8.7 L19.2 11.1"/>'
+        '</svg>'
+    )
+
+
 # --------------------------------------------------------------------------- #
-# Styling: clean, modern FTC-robotics look (dark navy / white / electric blue).
+# Styling: Absolute Zero identity — sub-zero frost blues on deep navy.
 # --------------------------------------------------------------------------- #
 st.markdown(
     """
     <style>
-      .block-container { padding-top: 1.4rem; max-width: 1120px; padding-bottom: 4rem; }
-      h1, h2, h3 { letter-spacing: -0.01em; }
-      /* Section headers get a subtle electric-blue accent rule. */
-      h3 { border-bottom: 1px solid #21406e; padding-bottom: 6px; }
-      /* Consistent slim brand header on every page. */
-      .az-topbar {
-        display:flex; align-items:center; justify-content:space-between;
-        background: linear-gradient(90deg, #0b1220 0%, #0d1b34 100%);
-        border: 1px solid #21406e; border-left: 4px solid #2f81f7;
-        border-radius: 10px; padding: 10px 16px; margin-bottom: 14px;
+      :root {
+        --az-bg:#060b13; --az-panel:#0c1626; --az-panel2:#0f1d31;
+        --az-line:#1d3a5c; --az-frost:#6fd0ff; --az-frost2:#3aa7e8;
+        --az-ice:#c4e7ff; --az-text:#e9f2fb; --az-muted:#88a0b8;
       }
-      .az-topbar .brand { color:#ffffff; font-weight:700; font-size:.98rem; }
-      .az-topbar .brand span { color:#2f81f7; }
-      .az-topbar .meta { color:#9aa7b8; font-size:.74rem; letter-spacing:.06em;
-                         text-transform:uppercase; }
-      .az-hero {
-        background: linear-gradient(135deg, #0d1b34 0%, #12305c 100%);
-        border: 1px solid #21406e; border-radius: 14px;
-        padding: 22px 26px; margin-bottom: 8px;
-      }
-      .az-hero h1 { margin: 0; color: #ffffff; font-size: 2.0rem; }
-      .az-hero p { margin: 6px 0 0; color: #9fc0ff; font-size: 1.05rem; }
-      .az-kicker { color:#2f81f7; font-weight:700; letter-spacing:.14em;
-                   font-size:.72rem; text-transform:uppercase; }
-      /* The loop shown on every tool page. */
-      .az-loop {
-        background:#111c30; border:1px solid #21406e; border-radius:8px;
-        padding:8px 14px; margin:6px 0 4px; color:#c9d6e5; font-size:.86rem;
-      }
-      .az-loop b { color:#2f81f7; }
-      .az-step { background:#111c30; border:1px solid #21406e; border-radius:10px;
-                 padding:14px 16px; height:100%; }
-      .az-step .n { color:#2f81f7; font-weight:700; font-size:.8rem; }
-      .az-step .t { color:#e6edf3; font-weight:600; margin-top:2px; }
-      .az-step .d { color:#9aa7b8; font-size:.86rem; margin-top:4px; }
-      div[data-testid="stMetricValue"] { color:#2f81f7; }
-      div[data-testid="stMetric"] {
-        background:#111c30; border:1px solid #21406e; border-radius:10px;
-        padding:10px 14px;
-      }
-      /* Footer on every page. */
-      .az-footer {
-        margin-top: 26px; padding-top: 12px; border-top: 1px solid #21406e;
-        color:#7f8ea3; font-size:.8rem; text-align:center;
-      }
-      .az-footer b { color:#9fc0ff; }
+      .block-container { padding-top: 1.2rem; max-width: 1140px; padding-bottom: 4rem; }
+      h1,h2,h3,h4 { letter-spacing:-0.01em; color:var(--az-text); }
+      /* Section headers become branded markers with a frost accent bar. */
+      h3 { border-left:3px solid var(--az-frost); padding-left:11px; margin-top:1.15rem; }
+      /* Brand top bar (every page). */
+      .az-topbar { display:flex; align-items:center; justify-content:space-between;
+        gap:14px; background:linear-gradient(90deg,#08111f 0%,#0d2140 100%);
+        border:1px solid var(--az-line); border-radius:12px; padding:11px 18px;
+        margin-bottom:16px;
+        box-shadow:0 10px 30px -18px rgba(111,208,255,.55); }
+      .az-brand { display:flex; align-items:center; gap:11px; }
+      .az-flake { color:var(--az-frost); filter:drop-shadow(0 0 5px rgba(111,208,255,.55)); }
+      .az-brand .name { font-weight:800; font-size:1.0rem; color:#fff; letter-spacing:.03em;
+        line-height:1.05; }
+      .az-brand .name b { background:linear-gradient(90deg,#d6efff,#6fd0ff);
+        -webkit-background-clip:text; background-clip:text; color:transparent; }
+      .az-brand .sub { display:block; font-size:.63rem; letter-spacing:.24em;
+        text-transform:uppercase; color:var(--az-muted); margin-top:2px; }
+      .az-topbar .meta { color:var(--az-muted); font-size:.68rem; letter-spacing:.14em;
+        text-transform:uppercase; text-align:right; }
+      /* Hero (Home). */
+      .az-hero { position:relative; overflow:hidden;
+        background:radial-gradient(130% 150% at 88% -30%, rgba(111,208,255,.20) 0%, rgba(111,208,255,0) 55%),
+                   linear-gradient(135deg,#0a1526 0%,#123056 100%);
+        border:1px solid var(--az-line); border-radius:16px; padding:26px 28px; margin-bottom:10px; }
+      .az-hero h1 { margin:.15rem 0 0; color:#fff; font-size:2.05rem; }
+      .az-hero p { margin:8px 0 0; color:var(--az-ice); font-size:1.06rem; }
+      .az-flake-bg { position:absolute; right:-24px; top:-24px;
+        color:rgba(111,208,255,.10); }
+      .az-kicker { color:var(--az-frost); font-weight:700; letter-spacing:.16em;
+        font-size:.72rem; text-transform:uppercase; }
+      /* Loop strip (tool pages). */
+      .az-loop { background:var(--az-panel); border:1px solid var(--az-line);
+        border-radius:10px; padding:9px 14px; margin:8px 0 6px; color:var(--az-ice);
+        font-size:.86rem; }
+      .az-loop b { color:var(--az-frost); font-weight:700; }
+      .az-loop .arw { color:var(--az-frost2); padding:0 5px; font-weight:700; }
+      /* Step cards (Home). */
+      .az-step { background:linear-gradient(180deg,var(--az-panel2),var(--az-panel));
+        border:1px solid var(--az-line); border-radius:12px; padding:15px 16px; height:100%; }
+      .az-step .n { color:var(--az-frost); font-weight:800; font-size:.7rem; letter-spacing:.12em; }
+      .az-step .t { color:var(--az-text); font-weight:700; margin-top:3px; }
+      .az-step .d { color:var(--az-muted); font-size:.85rem; margin-top:5px; line-height:1.35; }
+      /* Metrics. */
+      div[data-testid="stMetric"] { background:linear-gradient(180deg,var(--az-panel2),var(--az-panel));
+        border:1px solid var(--az-line); border-radius:12px; padding:12px 16px; }
+      div[data-testid="stMetricValue"] { color:var(--az-frost); }
+      /* Buttons. */
+      .stButton>button { border:1px solid var(--az-line); background:var(--az-panel2);
+        color:var(--az-ice); border-radius:9px; font-weight:600; transition:all .15s ease; }
+      .stButton>button:hover { border-color:var(--az-frost); color:#fff;
+        box-shadow:0 0 0 1px rgba(111,208,255,.25); }
+      button[kind="primary"], [data-testid="baseButton-primary"] {
+        background:linear-gradient(90deg,#2f8fd6,#6fd0ff)!important; color:#04121f!important;
+        border:none!important; font-weight:800!important; }
+      button[kind="primary"]:hover { box-shadow:0 0 16px -2px rgba(111,208,255,.6)!important; }
+      /* Inputs. */
+      .stTextInput input, .stTextArea textarea { border-radius:9px!important; }
+      /* Alerts keep their semantic color but match rounding + frost borders. */
+      div[data-testid="stAlert"] { border-radius:10px; border:1px solid var(--az-line); }
+      /* Sidebar. */
+      section[data-testid="stSidebar"] { background:#08111f; border-right:1px solid var(--az-line); }
+      /* Footer. */
+      .az-footer { margin-top:28px; padding:14px 0 0; border-top:1px solid var(--az-line);
+        color:var(--az-muted); font-size:.8rem; text-align:center; }
+      .az-footer b { color:var(--az-ice); }
+      .az-footer .flake { color:var(--az-frost); }
     </style>
     """,
     unsafe_allow_html=True,
@@ -141,12 +183,13 @@ st.markdown(
 
 
 def render_topbar():
-    """Consistent slim brand header shown at the top of every page."""
+    """Branded header bar shown at the top of every page."""
     st.markdown(
-        '<div class="az-topbar">'
-        '<span class="brand">Absolute Zero <span>AI Command Center</span></span>'
-        '<span class="meta">Team #12096 · FTC DECODE presented by RTX</span>'
-        '</div>',
+        '<div class="az-topbar"><div class="az-brand">' + _flake_svg("az-flake", 22) +
+        '<span class="name"><b>ABSOLUTE ZERO</b>'
+        '<span class="sub">Command Center</span></span></div>'
+        '<span class="meta">Team&nbsp;12096&nbsp;·&nbsp;FTC&nbsp;DECODE&nbsp;·&nbsp;'
+        'presented&nbsp;by&nbsp;RTX</span></div>',
         unsafe_allow_html=True,
     )
 
@@ -154,7 +197,8 @@ def render_topbar():
 def render_footer():
     """Consistent footer shown at the bottom of every page."""
     st.markdown(
-        '<div class="az-footer">FTC Team Absolute Zero #12096 — '
+        '<div class="az-footer"><span class="flake">' + _flake_svg("", 12) + '</span> '
+        'FTC Team Absolute Zero #12096 — '
         '<b>AI used as a structured feedback tool, not as an authority.</b></div>',
         unsafe_allow_html=True,
     )
@@ -163,8 +207,10 @@ def render_footer():
 def render_loop_line():
     """One-line explanation of the feedback loop for tool pages."""
     st.markdown(
-        '<div class="az-loop"><b>Evidence</b> → <b>AI Structure</b> → '
-        '<b>Human Validation</b> → <b>Team Action</b> → <b>Reflection</b></div>',
+        '<div class="az-loop"><b>Evidence</b><span class="arw">→</span>'
+        '<b>AI Structure</b><span class="arw">→</span><b>Human Validation</b>'
+        '<span class="arw">→</span><b>Team Action</b><span class="arw">→</span>'
+        '<b>Reflection</b></div>',
         unsafe_allow_html=True,
     )
 
@@ -298,8 +344,7 @@ PAGES = [
 def validation_banner(show_loop=True):
     st.warning(
         "AI is used as a structure and critique tool, not as an authority. "
-        "All outputs are reviewed by team members before the team acts on them.",
-        icon="⚠️",
+        "All outputs are reviewed by team members before the team acts on them."
     )
     if show_loop:
         render_loop_line()
@@ -370,10 +415,10 @@ def render_validation_fields(tool_name, subteam, problem, input_summary,
         }
         saved = save_entry(row)
         st.success(
-            f"✅ Saved. Entry {saved['entry_id']} ({tool_name}) was logged as "
-            f"**{validation_label}** by {human_reviewer}. View it under "
+            f"Saved. Entry {saved['entry_id']} ({tool_name}) was logged as "
+            f"{validation_label} by {human_reviewer}. View it under the "
             f"Evidence Dashboard.")
-        st.toast("Entry logged to Evidence Dashboard", icon="✅")
+        st.toast("Entry logged to the Evidence Dashboard")
 
 
 # --------------------------------------------------------------------------- #
@@ -631,7 +676,7 @@ def render_design_opposition():
              "tradeoffs, and tests before committing to a robot design.")
     validation_banner()
     st.info("AI critiques are not final decisions. The team must test or reject "
-            "each critique using evidence.", icon="🧪")
+            "each critique using evidence.")
 
     st.subheader("1. Describe the design under review")
     subteam = st.text_input("Subteam", value="Build / Design", key="do_subteam")
@@ -793,7 +838,7 @@ def render_scout_generator():
     validation_banner()
     st.info("This tool only works if the observations are accurate. The AI cannot "
             "see the robot — it can only build on what your scouts actually "
-            "recorded.", icon="👀")
+            "recorded.")
 
     st.subheader("1. Enter what your scouts observed")
     subteam = st.text_input("Subteam", value="Strategy / Scouting", key="sc_subteam")
@@ -953,7 +998,7 @@ def render_notebook_critic():
     validation_banner()
     st.warning("This tool critiques entries. It should not invent test data, "
                "photos, or decisions — and it never writes the entry for the "
-               "team. The team stays the author.", icon="✍️")
+               "team. The team stays the author.")
 
     st.subheader("1. Paste your team-authored draft and its evidence")
     subteam = st.text_input("Subteam", value="Portfolio / Documentation",
@@ -1104,7 +1149,7 @@ def render_accessibility_translator():
     validation_banner()
     st.info("The AI drafts a first version. Team members must check all "
             "explanations for technical accuracy before using them — AI drafts, "
-            "the team verifies and edits.", icon="🌍")
+            "the team verifies and edits.")
 
     st.subheader("1. Describe the concept and audience")
     subteam = st.text_input("Subteam", value="Outreach / Training", key="ac_subteam")
@@ -1259,7 +1304,7 @@ def render_code_debugger():
     validation_banner()
     st.warning("AI-generated code is not accepted unless it compiles, is reviewed "
                "by a programmer, and is tested on the robot or simulator. AI "
-               "assists debugging; humans own the final code decision.", icon="🧑‍💻")
+               "assists debugging; humans own the final code decision.")
 
     st.subheader("1. Describe the bug and its context")
     subteam = st.text_input("Subteam", value="Software / Programming", key="cd_subteam")
@@ -1353,9 +1398,10 @@ def render_home():
     st.markdown(
         """
         <div class="az-hero">
+          """ + _flake_svg("az-flake-bg", 168) + """
           <span class="az-kicker">Team #12096 · Absolute Zero · FTC DECODE presented by RTX</span>
-          <h1>Absolute Zero AI Command Center</h1>
-          <p>Turning team evidence into structured decisions.</p>
+          <h1>Absolute Zero Command Center</h1>
+          <p>Turning team evidence into structured, human-validated decisions.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1472,7 +1518,7 @@ def render_team_tracking():
              "and follow-ups.")
     validation_banner()
     st.info("AI-generated task lists must be approved by team leads because AI may "
-            "misread priorities.", icon="🗒️")
+            "misread priorities.")
 
     st.subheader("1. Paste the meeting notes")
     subteam = st.text_input("Subteam", value="Team Operations", key="tt_subteam")
@@ -1838,7 +1884,7 @@ def render_judge_handout():
         return
 
     st.info("This handout is built only from saved entries. Missing fields are "
-            "marked \"[add evidence]\" rather than invented.", icon="📝")
+            "marked \"[add evidence]\" rather than invented.")
 
     # Build selectable labels for each entry.
     def label_for(i, r):
@@ -1883,9 +1929,13 @@ def render_judge_handout():
 # Router
 # --------------------------------------------------------------------------- #
 with st.sidebar:
-    st.markdown('<span class="az-kicker">Absolute Zero</span>',
-                unsafe_allow_html=True)
-    st.markdown("### AI Command Center")
+    st.markdown(
+        '<div class="az-brand" style="margin-bottom:10px;">' +
+        _flake_svg("az-flake", 26) +
+        '<span class="name"><b>ABSOLUTE ZERO</b>'
+        '<span class="sub">Command Center</span></span></div>',
+        unsafe_allow_html=True,
+    )
     page = st.radio("Navigate", PAGES, label_visibility="collapsed")
     st.divider()
     sidebar_ai_settings()
