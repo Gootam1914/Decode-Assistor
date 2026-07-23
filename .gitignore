@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Secrets / environment (never commit)
+.streamlit/secrets.toml
+.env
+.env.*
+
+# OS / editor temp files
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+*~
+
+# NOTE: data/ai_feedback_log.csv is intentionally NOT ignored — it is the
+# team's real evidence log and should be committed.

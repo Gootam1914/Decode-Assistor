@@ -1,0 +1,9 @@
+streamlit>=1.30
+pandas>=1.5
+# csv, os, uuid, datetime, pathlib, typing are part of the Python standard library.
+
+# OPTIONAL — only for Direct API mode (the "Run AI Analysis" button). The app
+# runs fully in Manual mode without it. Install only if you want direct calls:
+#   pip install openai
+# then set OPENAI_API_KEY (and optionally OPENAI_MODEL, OPENAI_BASE_URL).
+# openai>=1.0
